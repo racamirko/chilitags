@@ -15,6 +15,12 @@
 *                                                                              *
 *   You should have received a copy of the GNU Lesser General Public License   *
 *   along with Chilitags.  If not, see <http://www.gnu.org/licenses/>.         *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*   13/08/02 - racamirko                                                       *
+*       Added video-file support and usage screen.                             *
+*                                                                              *
 *******************************************************************************/
 
 // This file serves as an illustration of how to use Chilitags
@@ -76,6 +82,7 @@ int main(int argc, char* argv[])
         inputFromFile = true;
     } else {
         displayUsage();
+        return 1;
     }
 
 	// The source of input images
