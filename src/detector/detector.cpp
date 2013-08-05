@@ -34,6 +34,9 @@ using namespace CvConvenience;
 
 // C-Style string to int conversion and string formatting.
 #include <cstdio>
+#include <iostream> // for consol output
+
+void displayUsage();
 
 // Some basic, portable timing
 #ifdef WIN32
@@ -60,6 +63,7 @@ int main(int argc, char* argv[])
 	int tXRes = 640;
 	int tYRes = 480;
 	int tCameraIndex = 0;
+    bool inputFromFile = false;
 	if (argc > 2) {
 		tXRes = std::atoi(argv[1]);
 		tYRes = std::atoi(argv[2]);
@@ -68,18 +72,35 @@ int main(int argc, char* argv[])
 		tCameraIndex = atoi(argv[3]);
 	}
 
+    if( tXRes == 0 || argc == 2 ){ // errors, or only one input == filename of video
+        inputFromFile = true;
+    } else {
+        displayUsage();
+    }
+
 	// The source of input images
-	CvCapture *tCapture = cvCaptureFromCAM(tCameraIndex);
+    CvCapture *tCapture = NULL;
+    if(inputFromFile){
+        tCapture = cvCaptureFromAVI(argv[1]);
+    }else{
+        tCapture = cvCaptureFromCAM(tCameraIndex);
+    }
+
 	if (!tCapture)
 	{
 		std::cerr << "unable to initialise CVCapture" << std::endl;
 		return 1;
 	}
-	cvSetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_WIDTH, tXRes);
-	cvSetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_HEIGHT, tYRes);
-	cvSetCaptureProperty(tCapture, CV_CAP_PROP_FPS, tCameraIndex);
-	cvSetCaptureProperty(tCapture, CV_CAP_PROP_MODE, 1);
-
+    if( inputFromFile ){
+        tXRes = (int) cvGetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_WIDTH);
+        tYRes = (int) cvGetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_HEIGHT);
+        tXRes = (int) cvGetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_WIDTH);
+    } else {
+        cvSetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_WIDTH, tXRes);
+        cvSetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_HEIGHT, tYRes);
+        cvSetCaptureProperty(tCapture, CV_CAP_PROP_FPS, tCameraIndex); // a bit unclear
+        cvSetCaptureProperty(tCapture, CV_CAP_PROP_MODE, 1);
+    }
 
 	// A data structure needed for OpenCv to draw text.
 	CvFont mFont;
@@ -213,4 +234,13 @@ int main(int argc, char* argv[])
 	cvDestroyWindow("DisplayChilitags");
 
 	return 0;
+}
+
+
+void displayUsage(){
+    std::cout << "Detector v1.0" << std::endl;
+    std::cout << "Usage with camera:" << std::endl;
+    std::cout << "\t\t./detector [x-res y-res [camera-index]]" << std::endl;
+    std::cout << "or with a video file (supported by OpenCV)" << std::endl;
+    std::cout << "\t\t./detector <filename>" << std::endl;
 }
