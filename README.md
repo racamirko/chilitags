@@ -1,4 +1,4 @@
-Chilitags, Robust Fiducial Markers for Augmented Reality
+Chilitags: Robust Fiducial Markers for Augmented Reality
 ========================================================
 
 Chilitags are a C++ cross-platform software library for the detection and
@@ -148,37 +148,55 @@ terms (but you don't have to share the sources of the rest of your software).
 You should also credit the authors.
 
 We especially appreciate a reference in your paper, should you use Chilitags
-for a research project.  Let us make that easy for you:
+for a research project. Let us make that easy for you:
 
- * Chilitags, Robust Fiducial Markers for Augmented Reality. Q. Bonnard, G.
+ * Chilitags: Robust Fiducial Markers for Augmented Reality. Q. Bonnard, G.
    Zufferey, A. Mazzei, S. Cuendet, N. Li, P. Dillenbourg. CHILI, EPFL,
    Switzerland. `http://chili.epfl.ch/`. 2013.
 
-    @misc{chilitags,
-        title = {Chilitags, Robust Fiducial Markers for Augmented Reality.},
-        author={Q. Bonnard, G. Zufferey, A. Mazzei, S. Cuendet, N. Li, P. Dillenbourg},
-        publisher={CHILI, EPFL, Switzerland},
-        url={http://chili.epfl.ch/TODO},
-        year={2013},
-    }
+```
+	@misc{chilitags,
+		title = {Chilitags: Robust Fiducial Markers for Augmented Reality.},
+		author={Bonnard, Quentin and Zufferey, Guillaume and Mazzei, Andrea and Cuendet, S\'{e}bastien and Li, Nan and Dillenbourg, Pierre},
+		publisher={CHILI, EPFL, Switzerland},
+		url={http://chili.epfl.ch/software},
+		year={2013}
+	}
+```
 
-Should you require an different licence, please contact [CHILI](http://chili.epfl.ch).
+Should you require a different licence, please contact [CHILI](http://chili.epfl.ch).
 
 Contributing and Issues
 -----------------------
 
 This release intends to be minimal, with only the core functionality of
-Chilitags: given an image, identify which tag is where.  Such a release is
-especially adapted to developers who want to embed marker detection in their
-C++ application.  More user-friendly releases (e.g. bindings to other
-languages, TUIO wrapper, etc.) or additional features (tracking, calibration,
-3D postions, etc.) may come in further releases.
+Chilitags: given an image, identify which tag is where. Additional features
+(tracking, calibration, 3D positions, etc.) may come in further releases.
+The current release is especially adapted to developers who want to embed
+marker detection in their C++ application. A [TUIO server for chilitags](https://github.com/qbonnard/chilitags-tuio)
+allows the use of chilitags with other, independent applications. 
 
 Despite the efforts done to extract this release from "research code",
-Chilitags can easily be improved on the software engineering level.  Chilitags
-have been extensively used in the past years, but no proper tests have been
-developed.  Documentation have been created only for this release, and can
-probably be augmented.  The coding style can also be improved, especially
-regarding the purity of the C++ regarding C aspects, or the use of legacy
-features of OpenCV.  Contributions are very welcome.
+Chilitags can easily be improved on the software engineering level.
+Documentation have been created only for this release, and can
+probably be augmented. Contributions are very welcome.
 
+Chilitags have been extensively used in the past years, but proper tests are a
+more recent addition. To run automated testes, you need to activate them in the
+CMake configuration (option `WITH_TESTS`). The test data is in a [separate
+repository](https://github.com/chili-epfl/chilitags-testdata). The easiest is
+to clone it in a directory at the same level as your local copy of Chilitags, or
+you will also need to update the path in the `CMakeLists.txt`. Then you can run
+the test suite using CMake's test target.
+
+Example on Unix
+```
+git clone git@github.com:chili-epfl/chilitags
+git clone git@github.com:chili-epfl/chilitags-testdata.git
+cd chilitags
+mkdir build
+cd build
+cmake ..
+make
+make test
+```

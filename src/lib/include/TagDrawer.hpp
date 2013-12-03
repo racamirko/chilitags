@@ -17,47 +17,53 @@
 *   along with Chilitags.  If not, see <http://www.gnu.org/licenses/>.         *
 *******************************************************************************/
 
-#ifndef Binarize_HPP
-#define Binarize_HPP
+#ifndef TagDrawer_HPP
+#define TagDrawer_HPP
 
-#include "Pipeable.hpp"
-#include <opencv2/opencv.hpp>
+#include <Codec.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 namespace chilitags {
 
-// This class is an implementation of:
-// BRADLEY, Derek et ROTH, Gerhard. Adaptive thresholding using the integral
-// image. journal of graphics, gpu, and game tools, 2007, vol. 12, no 2,
-// p. 13-21.
-class Binarize : public Pipeable {
+class TagDrawer {
+
 public:
-Binarize(
-        float pThreshold,
-        float pWindowSizePerc,
-        const IplImage *const *pInputImage);
 
-virtual ~Binarize();
+	TagDrawer():
+	mCodec()
+	{
+	}
 
-const IplImage *const *GetOutputImage() const {
-	return &mOutputImage;
-};
+	cv::Mat operator()(int pTagId, int pZoom = 1, bool pWithMargin = false) {
+		// Creating the image of the bit matrix
+		static const int DATA_SIZE = 6;
+		cv::Size tDataDim(DATA_SIZE,DATA_SIZE);
+		unsigned char tDataMatrix[DATA_SIZE*DATA_SIZE];
+		mCodec.getTagEncodedId(pTagId, tDataMatrix);
+		cv::Mat tDataImage(tDataDim, CV_8U, tDataMatrix);
+		tDataImage *= 255;
 
-protected:
-void run();
+		// Adding the black border arounf the bit matrix
+		cv::Size tBorderSize(2,2);
+		cv::Mat tTagImage(tDataImage.size()+tBorderSize*2, CV_8U, cv::Scalar(0));
+		tDataImage.copyTo(tTagImage(cv::Rect(tBorderSize, tDataImage.size())));
 
-float mThreshold;
-float mWindowSizePerc;
-const IplImage *const *mInputImage;
-int mInputWidth;
-int mInputHeight;
-IplImage *mIntegralImage;
-IplImage *mOutputImage;
+		// Adding the optionnal white margin
+		cv::Size tMarginSize(0,0);
+		if (pWithMargin) tMarginSize += tBorderSize;
+		cv::Mat tOutlinedImage(tTagImage.size()+tMarginSize*2, CV_8U, cv::Scalar(255));
+		tTagImage.copyTo(tOutlinedImage(cv::Rect(tMarginSize, tTagImage.size())));
+
+		// Resizing to specified zoom
+		cv::Mat tOutputImage(tOutlinedImage.size()*pZoom, CV_8U);
+		cv::resize(tOutlinedImage, tOutputImage, tOutputImage.size(), 0, 0, cv::INTER_NEAREST);
+		return tOutputImage;
+	}
 
 private:
-Binarize(const Binarize&);
-Binarize &operator=(const Binarize&);
+	Codec mCodec;
 };
-
 
 }
 

@@ -16,9 +16,10 @@ add_library(
         ${chilitags_source}
 )
 
-include_directories(include)
-find_package( OpenCV REQUIRED )
-target_link_libraries(chilitags)
+add_definitions(-std=c++11)
+
+include_directories(include ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(chilitags ${OpenCV_LIBS})
 
 install (TARGETS chilitags
 	LIBRARY DESTINATION lib
@@ -37,6 +38,13 @@ install(FILES
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/chilitags.pc.in")
     message(STATUS "configuring ${CMAKE_SOURCE_DIR}/chilitags.pc.in --> ${CMAKE_CURRENT_BINARY_DIR}/chilitags.pc")
+
+    # build a list of -D<...> macros to store in pkgconfig CFlags
+    get_directory_property(INTERNAL_COMPILE_FLAGS COMPILE_DEFINITIONS)
+    foreach(DEF ${INTERNAL_COMPILE_FLAGS})
+        set(COMPILE_FLAGS "${COMPILE_FLAGS} -D${DEF}")
+    endforeach()
+
     configure_file(${CMAKE_SOURCE_DIR}/chilitags.pc.in 
       ${CMAKE_CURRENT_BINARY_DIR}/chilitags.pc
       @ONLY )

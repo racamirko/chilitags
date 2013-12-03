@@ -21,15 +21,15 @@
 #define ReadBits_HPP
 
 #include "Pipeable.hpp"
-#include <opencv2/opencv.hpp>
-#include "Binarize.hpp"
+#include <Quad.hpp>
 
 namespace chilitags {
 
 class ReadBits : public Pipeable
 {
 public:
-ReadBits(const IplImage *const *pInputImage);
+ReadBits(const cv::Mat *pInputImage,
+         const Quad *pCorners);
 const unsigned char *const *GetBits() const {
 	return &mMatrix;
 }
@@ -39,7 +39,16 @@ virtual ~ReadBits();
 protected:
 void run();
 
-Binarize mBinarize;
+const cv::Mat& mInputImage;
+
+std::vector<cv::Point2f> mDstBoundaries;
+std::vector<cv::Point2f> mSamplePoints;
+
+const Quad *mCorners;
+
+const cv::Size mSize;
+
+
 
 unsigned char *mMatrix;
 

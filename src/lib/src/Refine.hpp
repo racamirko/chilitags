@@ -21,8 +21,8 @@
 #define Refine_HPP
 
 #include "Pipeable.hpp"
-#include <opencv2/opencv.hpp>
 #include <Registrar.hpp>
+#include <Quad.hpp>
 
 namespace chilitags {
 
@@ -31,34 +31,23 @@ class Refine : public Pipeable
 public:
 
 Refine(
-        const IplImage *const *pInputImage,
-        const int *pDecodedTag,
-        Registrar &pRegistrar);
+        const cv::Mat *pInputImage,
+        const std::vector<Quad> *quads);
+
 virtual ~Refine();
 
-const CvPoint2D32f*const *GetRefinedCorners() const {
-	return &mOrderedCorners;
+const std::vector<Quad> *GetRefinedQuads() const {
+	return &mRefinedQuads;
 }
 
 protected:
 void run();
 
-const IplImage *const *mInputImage;
-const int *mDecodedTag;
+const cv::Mat *mInputImage;
 
-CvRect mBoundingBox;
-CvRect mROI;
-CvPoint *mInternalCorners;
-IplImage *mROICopy;
-IplImage *mMask;
-IplImage *mTempImg;
-IplImage *mEigenImg;
-
-int mNCorners;
-CvPoint2D32f* mRefinedCorners;
-CvPoint2D32f* mOrderedCorners;
-
-Registrar &mRegistrar;
+const std::vector<Quad>& mQuads;
+std::vector<Quad> mRefinedQuads;
+std::vector<cv::Point2f> mRefinedCorners;
 
 private:
 Refine(const Refine& pRefine);
