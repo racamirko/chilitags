@@ -97,7 +97,7 @@ if (WITH_SAMPLES)
         objects_source_files
         samples/objects/objects.cpp
     )
-    add_definitions(-std=c++0x)
+    add_definitions(-std=c++11)
     include_directories(src/lib/include)
     add_executable(
         objects

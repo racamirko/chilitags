@@ -28,7 +28,7 @@ add_library(
         ${chilitags_source}
 )
 
-add_definitions(-std=c++0x)
+add_definitions(-std=c++11)
 
 include_directories(include ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(chilitags ${OpenCV_LIBS})
