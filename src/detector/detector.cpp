@@ -70,32 +70,32 @@ int main(int argc, char* argv[])
     }
 
 	// The source of input images
-    CvCapture *tCapture = NULL;
+    cv::VideoCapture tCapture;
     if(inputFromFile){
-        tCapture = cvCaptureFromAVI(argv[1]);
+        tCapture = cv::VideoCapture(argv[1]);
     }else{
-        tCapture = cvCaptureFromCAM(tCameraIndex);
+        tCapture = cv::VideoCapture(tCameraIndex);
     }
 
-	if (!tCapture)
+    if (!tCapture.isOpened())
 	{
 		std::cerr << "Unable to initialise video capture." << std::endl;
 		return 1;
 	}
     if( inputFromFile ){
-        tXRes = (int) cvGetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_WIDTH);
-        tYRes = (int) cvGetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_HEIGHT);
-        tXRes = (int) cvGetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_WIDTH);
+        tXRes = (int )tCapture.get(CV_CAP_PROP_FRAME_WIDTH); // (int) cvGetCaptureProperty(tCapture, CV_CAP_PROP_FRAME_WIDTH);
+        tYRes = (int) tCapture.get(CV_CAP_PROP_FRAME_HEIGHT);
+        tXRes = (int) tCapture.get(CV_CAP_PROP_FRAME_WIDTH);
     } else {
 #ifdef OPENCV3
-	tCapture.set(cv::CAP_PROP_FRAME_WIDTH, tXRes);
-	tCapture.set(cv::CAP_PROP_FRAME_HEIGHT, tYRes);
+	tCapture->set(cv::CAP_PROP_FRAME_WIDTH, tXRes);
+	tCapture->set(cv::CAP_PROP_FRAME_HEIGHT, tYRes);
 #else
-	tCapture.set(CV_CAP_PROP_FRAME_WIDTH, tXRes);
-	tCapture.set(CV_CAP_PROP_FRAME_HEIGHT, tYRes);
+    tCapture.set(CV_CAP_PROP_FRAME_WIDTH, tXRes);
+    tCapture.set(CV_CAP_PROP_FRAME_HEIGHT, tYRes);
 #endif
-        cvSetCaptureProperty(tCapture, CV_CAP_PROP_FPS, tCameraIndex); // a bit unclear
-        cvSetCaptureProperty(tCapture, CV_CAP_PROP_MODE, 1);
+//        cvSetCaptureProperty(tCapture, CV_CAP_PROP_FPS, tCameraIndex); // a bit unclear
+        tCapture.set(CV_CAP_PROP_MODE, 1);
     }
 
 	cv::namedWindow("DisplayChilitags");
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 	for (; 'q' != (char) cv::waitKey(1); ) {
 
 		// Capture a new image.
-		tCapture.read(tInputImage);
+        tCapture >> tInputImage;
 
 		// Detect tags on the current image.
 	    int64 tStartCount = cv::getTickCount();
@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
 	}
 
 	cv::destroyWindow("DisplayChilitags");
-	tCapture.release();
+    tCapture.release();
 
 	return 0;
 }
