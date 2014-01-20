@@ -1,22 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(chilitags)
+project(chilitags CXX)
 
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
-set(CPACK_PACKAGE_VERSION_MINOR "2")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_PACKAGE_VERSION_MINOR "3")
+set(CPACK_PACKAGE_VERSION_PATCH "1")
 
-find_package( OpenCV REQUIRED core imgproc calib3d highgui ts )
+find_package( OpenCV REQUIRED )
+
 message(STATUS "OpenCV version: ${OpenCV_VERSION}")
-
-if(${OpenCV_VERSION} VERSION_GREATER 2.9.0)
-    add_definitions(-DOPENCV3)
-endif()
-
-add_subdirectory(src/lib)
-
-# documentation generation
-include("${CMAKE_SOURCE_DIR}/cmake/TargetDoc.cmake" OPTIONAL)
 
 ##########################################
 ##           Options                   ###
@@ -28,8 +20,28 @@ option (WITH_CREATOR "provides the marker generation tool" ON)
 option (WITH_SAMPLES "compile misc demos" OFF)
 option (WITH_TESTS "build tests" OFF)
 set(TEST_DATA "../../../chilitags-testdata/" CACHE PATH "specify the root directory of the test data (absolute, or relative to the execution directory of the tests)")
+option(EXPERIMENTAL_LSD "Detects quad with the LineSegmentDetector algorithm (requires OpenCV3)" OFF)
+
+if(${OpenCV_VERSION} VERSION_GREATER 2.9.0)
+    add_definitions(-DOPENCV3)
+else()
+    set(EXPERIMENTAL_LSD OFF)
+endif()
+
+if(EXPERIMENTAL_LSD)
+    add_definitions(-DEXPERIMENTAL_LSD)
+endif()
+
+add_subdirectory(src/lib)
+
+# documentation generation
+include("${CMAKE_SOURCE_DIR}/cmake/TargetDoc.cmake" OPTIONAL)
 
 if (WITH_DETECTOR)
+
+    if(NOT OPENCV_HIGHGUI_FOUND)
+        message(FATAL_ERROR "OpenCV compiled without support for highgui! Can not compile detector.")
+    endif()
 
     file(
         GLOB_RECURSE
@@ -53,6 +65,10 @@ endif()
 
 if (WITH_CREATOR)
 
+    if(NOT OPENCV_HIGHGUI_FOUND)
+        message(FATAL_ERROR "OpenCV compiled without support for highgui! Can not compile creator.")
+    endif()
+
     file(
         GLOB_RECURSE
         creator_source_files
@@ -72,6 +88,10 @@ if (WITH_CREATOR)
 endif()
 
 if (WITH_SAMPLES)
+
+    if(NOT OPENCV_HIGHGUI_FOUND)
+        message(FATAL_ERROR "OpenCV compiled without support for highgui! Can not compile samples.")
+    endif()
 
     set(
         objects_source_files
@@ -101,6 +121,10 @@ if (WITH_SAMPLES)
 endif()
 
 if (WITH_TESTS)
-	enable_testing()
-	add_subdirectory(test)
+    if(NOT OPENCV_TS_FOUND)
+        message(FATAL_ERROR "OpenCV compiled without support for ts! Can not compile tests.")
+    endif()
+
+    enable_testing()
+    add_subdirectory(test)
 endif()
