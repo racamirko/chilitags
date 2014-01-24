@@ -91,8 +91,12 @@ void chilitags::ReadBits::run()
     cv::Mat tInputRoi = mInputImage(tRoi);
 	cv::Mat tSamples(1, scDataSize*scDataSize, CV_8U);
 	uchar* tSampleData = tSamples.ptr(0);
+    cv::Rect tImageArea = cv::Rect(cv::Point(0,0), cv::Size(tInputRoi.cols, tInputRoi.rows));
     for (auto& tTransformedSamplePoint : tTransformedSamplePoints) {
-		*tSampleData++ = tInputRoi.at<uchar>(tTransformedSamplePoint);
+        if( tImageArea.contains(tTransformedSamplePoint)  )
+            *tSampleData++ = tInputRoi.at<uchar>(tTransformedSamplePoint);
+        else
+            *tSampleData++ = 0; // dummy data
     }
 
 	cv::Mat tBinarizedImage(cv::Size(scDataSize*scDataSize, 1), CV_8U, mMatrix);
